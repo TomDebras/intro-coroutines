@@ -4,13 +4,20 @@ import contributors.*
 import retrofit2.Response
 
 fun loadContributorsBlocking(service: GitLabService, req: RequestData) : List<User> {
-    val repos = service
-        .getOrgReposCall(req.org)
-        .execute() // Executes request and blocks the current thread
-        .also { logRepos(req, it) }
-        .body() ?: emptyList()
+    val allRepos = mutableListOf<Repo>()
+    var page = 1
+    var hasMore = true
+    while (hasMore) {
+        val response = service.getOrgReposCall(req.org, page, 20).execute().also {logRepos(req, it)}
+        val repos = response.body()
+        if (repos != null) {
+            allRepos.addAll(repos)
+        }
+        page++
+        hasMore = repos != null && repos.size == 20
+    }
 
-    return repos.flatMap { repo ->
+    return allRepos.flatMap { repo ->
         service
             .getRepoContributorsCall(repo.id.toString())
             .execute() // Executes request and blocks the current thread

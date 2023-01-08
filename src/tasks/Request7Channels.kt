@@ -15,6 +15,11 @@ suspend fun loadContributorsChannels(
         .also { logRepos(req, it) }
         .bodyList()
 
+    if (repos.isEmpty()) {
+        updateResults(emptyList(), true)
+        return@coroutineScope
+    }
+
     val channel = Channel<List<User>>()
     for (repo in repos) {
         launch {

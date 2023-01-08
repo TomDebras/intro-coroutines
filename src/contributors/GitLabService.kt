@@ -11,11 +11,19 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface GitLabService {
     @GET("groups/{org}/projects")
     fun getOrgReposCall(
-        @Path("org") org: String
+        @Path("org") org: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): Call<List<Repo>>
+
+    @GET("groups/{org}/projects")
+    fun getOrgReposCall(
+        @Path("org") org: String,
     ): Call<List<Repo>>
 
     @GET("projects/{repo}/repository/contributors")

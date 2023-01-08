@@ -12,6 +12,11 @@ suspend fun loadContributorsProgress(
         .also { logRepos(req, it) }
         .bodyList()
 
+    if (repos.isEmpty()) {
+        updateResults(emptyList(), true)
+        return
+    }
+
     var allUsers = emptyList<User>()
     for ((index, repo) in repos.withIndex()) {
         val users = service.getRepoContributors(repo.id.toString())
